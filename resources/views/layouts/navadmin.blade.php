@@ -72,11 +72,14 @@
                 </div>
             </div>
         </nav>
-
+        <style type="text/css">
+          .hide {display: none;}
+        </style>
         @yield('content')
     </div>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+    
 </body>
 </html>

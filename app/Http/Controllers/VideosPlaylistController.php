@@ -45,19 +45,22 @@ class VideosPlaylistController extends Controller
      //validar si la url esta vacia guardar el path con la ruta del archivo
      //dd($results);
      $indice = $results[0]->id;
-     dd($indice);
-     $file = $request->file('video');
-     $extension = $request->file('video')->getClientOriginalExtension();
      $videoplaylist = new Videoplaylist($request->all());
-     $name = $videoplaylist->name . '.' . $extension;
-     $path =  public_path() . '\videos\Playlist';
-     $file->move($path.'\\'.$name);
-  //   dd($path.'\\'.$name);
-  //     dd($request);
-      if ($request->url= "null") {
-         $videoplaylist->url  =($path.'\\'.$name);
-         $videoplaylist->id_user = $results->id;
-         dd($videoplaylist);
+
+      if ($request->url== null) {
+        $file = $request->file('video');
+        $path =  public_path() . '\videos\Playlist';
+        $extension = $request->file('video')->getClientOriginalExtension();
+        $name = $videoplaylist->name . '.' . $extension;
+        $url = ($path.'\\'.$name);
+        $videoplaylist->url=$url;
+        $videoplaylist->id_playlis=$indice;
+        $videoplaylist->save();
+        $file->move($path.'\\'.$name);
+      }else{
+        $videoplaylist->url= $request->url;
+        $videoplaylist->id_playlis=$indice;
+        $videoplaylist->save();
       }
 
       // $file->move($path, "video");

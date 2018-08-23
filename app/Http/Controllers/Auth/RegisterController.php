@@ -81,15 +81,28 @@ class RegisterController extends Controller
             'birth' => $data['birth'],
             'verifyToken' => Str::random(40),
         ]);
+        //FindOrFail permite recuperar un registro de un modelo a partir de su ID
+        // sin necesidad de comprobar si existe
         $thisUser = User::FindOrFail($user->id);
         $this->sendEmail($thisUser);
-
+        //creamos el id de playlist para relacionarlo con la tabla usuarios
         $id_user=$user->id;
         Playlis::create([
           'id_user' => $id_user,
         ]);
-
         return $user;
+        Flash::success("Se ha registrado el usuario de manera exitosa!, verifique su correo para iniciar sessión");
+    }
+
+    protected function update(Request $request, $id)
+    {
+        $user = User::find($id);
+        $user->name = $request->name;
+        $user->lastname = $request->lastname;
+        $user->password=$request->password;
+        $user->country=$request->country;
+        $user->birth=$request->birth;
+        $user->save();
     }
 
     public function sendEmail($thisUser)
@@ -99,6 +112,7 @@ class RegisterController extends Controller
     public function verifyEmailFirst()
     {
       return view('email.verifyEmailFirst');
+      return view('auth.login');
     }
 
     public function sendEmailDone($email, $verifyToken)
@@ -106,6 +120,7 @@ class RegisterController extends Controller
       $user = User::where(['email'=>$email, 'verifyToken'=> $verifyToken])->first();
       if ($user) {
         return user::Where(['email'=>$email, 'verifyToken'=> $verifyToken])-> update(['status'=>'1', 'verifyToken'=>NULL]);
+        return view('auth.login');
       }else {
         return 'usuario no encontrado';
       }

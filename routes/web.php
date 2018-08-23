@@ -23,6 +23,7 @@ Route::get('verifyEmailFirst', 'Auth\RegisterController@verifyEmailFirst')->name
 
 Route::get('verify/{email}/{verifyToken}', 'Auth\RegisterController@sendEmailDone')->name('sendEmailDone');
 
+//crea las rutas de acuerdo a los metodos creados en el Controlador
 Route::group([ 'prefix' => 'admin'], function()
 {
                     //nomb. rutas    //nomb. controlador
@@ -31,5 +32,7 @@ Route::group([ 'prefix' => 'admin'], function()
       'uses' => 'VideosPlaylistController@destroy',
       'as'  => 'admin.videoplaylist.destroy'
    ]);
+                    //nomb. rutas    //nomb. controlador
+
 
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\UploadedFile;
 use Collective\Html\Eloquent\FormAccessible;
 use App\User;
@@ -45,19 +46,21 @@ class VideosPlaylistController extends Controller
      $indice = $results[0]->id;
      $videoplaylist = new Videoplaylist($request->all());
      //verifica que la url este vacia con esto damos por hecho que se carga un video de la pc
+      $file = $request->file('video');
       if ($request->url== null) {
-        $file = $request->file('video');
         $path =  public_path() . '\videos\Playlist';
         $extension = $request->file('video')->getClientOriginalExtension();
-        $name = $videoplaylist->name . '.' . $extension;
+        $name = $request->name . '.' . $extension;
         $url = ($path.'\\'.$name);
-        $videoplaylist->url=$url;
+        $videoplaylist->nombre_video=$request->name;
+        $videoplaylist->url_video=$url;
         $videoplaylist->id_playlis=$indice;
         $videoplaylist->save();
         $file->move($path.'\\'.$name);
       }else{
         //de lo contrario se estaria guardando la url del video de youtube
-        $videoplaylist->url= $request->url;
+        $videoplaylist->nombre_video=$request->name;
+        $videoplaylist->url_video= $request->url;
         $videoplaylist->id_playlis=$indice;
         $videoplaylist->save();
       }
@@ -137,7 +140,7 @@ class VideosPlaylistController extends Controller
       $videoplaylist = Videoplaylist::find($id);
       $videoplaylist->delete();
       flash("Se ha eliminado usuario de forma exitosa")->error();
-      return redirect()->route('user.index');
+      return redirect()->route('videoplaylist.index');
    }
 
    public function __construct()

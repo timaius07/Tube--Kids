@@ -38,21 +38,23 @@ class UsersKidsController extends Controller
      */
     public function store(Request $request)
     {
-      $request->validate([
-        'namefull' => 'required|unique:posts|max:255',
-        'username' => 'required',
-        'age' => 'required',
-        'pin' => 'required|max:6',
-        ]);
+        //datos del usuario
+        $iduser = Auth::id();
+
         $userKids = new UserKid($request->all());
         $userKids->pin = bcrypt($request->password);
-
-
-        if ($userKids->fails()) {
-         return redirect('admin.userKids.create')
-                     ->withErrors($userKids)
-                     ->withInput();
-      }else{
+        $userKids->id_user=$iduser;
+        $validator = Validator::make($request->all(), [
+        'namefull' => 'required',
+        'username' => 'required',
+        'age' => 'required',
+        'pin' => 'required',
+        ]);
+        if ($validator->fails()) {
+                  return redirect('admin/videoplaylist/create')
+                  ->withErrors($validator)
+                  ->withInput();
+        }else{
         $userKids->save();
      }
 
@@ -77,7 +79,8 @@ class UsersKidsController extends Controller
      */
     public function edit($id)
     {
-        //
+      $userKids= UserKid::find($id);
+      return view ('admin.userkids.edit')->with ('userkid', $userKids);
     }
 
     /**
@@ -89,7 +92,25 @@ class UsersKidsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $userKids=UserKid::find($id);
+        $userKids->namefull = $request->namefull;
+        $userKids->username = $request->username;
+        $userKids->age = $request->age;
+        $userKids->pin = $request->pin;
+
+        $validator = Validator::make($request->all(), [
+        'namefull' => 'required',
+        'username' => 'required',
+        'age' => 'required',
+        'pin' => 'required',
+        ]);
+        if ($validator->fails()) {
+                  return redirect('admin/userkids/edit')
+                  ->withErrors($validator)
+                  ->withInput();
+        }else{
+        $userKids->save();
+     }
     }
 
     /**

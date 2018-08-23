@@ -47,6 +47,16 @@ class VideosPlaylistController extends Controller
      $videoplaylist = new Videoplaylist($request->all());
      //verifica que la url este vacia con esto damos por hecho que se carga un video de la pc
       $file = $request->file('video');
+      //valida que contengan todos los datos solicitados
+      $validator = Validator::make($request->all(), [
+      'video' => 'required',
+      'name' => 'required',
+      ]);
+      if ($validator->fails()) {
+                return redirect('admin/videoplaylist/create')
+                ->withErrors($validator)
+                ->withInput();
+      }
       if ($request->url== null) {
         $path =  public_path() . '\videos\Playlist';
         $extension = $request->file('video')->getClientOriginalExtension();
@@ -59,6 +69,15 @@ class VideosPlaylistController extends Controller
         $file->move($path.'\\'.$name);
       }else{
         //de lo contrario se estaria guardando la url del video de youtube
+        $validator = Validator::make($request->all(), [
+        'url' => 'required',
+        'name' => 'required',
+        ]);
+        if ($validator->fails()) {
+                  return redirect('admin/videoplaylist/create')
+                  ->withErrors($validator)
+                  ->withInput();
+        }
         $videoplaylist->nombre_video=$request->name;
         $videoplaylist->url_video= $request->url;
         $videoplaylist->id_playlis=$indice;

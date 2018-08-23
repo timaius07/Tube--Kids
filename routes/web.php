@@ -33,6 +33,10 @@ Route::group([ 'prefix' => 'admin'], function()
       'as'  => 'admin.videoplaylist.destroy'
    ]);
                     //nomb. rutas    //nomb. controlador
-
+    Route::resource('userkids', 'UsersKidsController');
+    Route::get('userkids/{id}/destroy', [
+    'uses' => 'UsersKidsController@destroy',
+    'as'  => 'admin.userkids.destroy'
+  ]);
 
 });

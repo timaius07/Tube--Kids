@@ -13,4 +13,11 @@ class PlaylistController extends Controller
       '$id_user' => $id_user,
     ]);
   }
+
+  public function destroy($id)
+  {
+     $playlist = Playlis::find($id);
+     $playlist->delete();
+     flash("Se ha eliminado la lista de forma exitosa")->error();
+  }
 }

@@ -39,14 +39,12 @@ class VideosPlaylistController extends Controller
 
      //datos del usuario
      $iduser = Auth::id();
-     //datos de los playlist
-    $playlist = Playlis::orderBy('id', 'ASC') -> pluck ('id', 'id_user') ;
+     //datos de los playlist para identificar el usuario dueño de la misma.
     $results = DB::select('select * from playlis where id_user = :id', ['id' => $iduser]);
-     //validar si la url esta vacia guardar el path con la ruta del archivo
      //dd($results);
      $indice = $results[0]->id;
      $videoplaylist = new Videoplaylist($request->all());
-
+     //verifica que la url este vacia con esto damos por hecho que se carga un video de la pc
       if ($request->url== null) {
         $file = $request->file('video');
         $path =  public_path() . '\videos\Playlist';
@@ -58,20 +56,11 @@ class VideosPlaylistController extends Controller
         $videoplaylist->save();
         $file->move($path.'\\'.$name);
       }else{
+        //de lo contrario se estaria guardando la url del video de youtube
         $videoplaylist->url= $request->url;
         $videoplaylist->id_playlis=$indice;
         $videoplaylist->save();
       }
-
-      // $file->move($path, "video");
-      // $url = $request->input('url');
-      // $videoplaylist->url = $url;
-      // dd($videoplaylist);
-       //$videoplaylist -> save();
-    // }
-
-
-
    }
 
    /**
@@ -93,7 +82,9 @@ class VideosPlaylistController extends Controller
    */
    public function edit($id)
    {
-      //
+     //realiza la busqueda del video en el playlist para mostrarlo
+     $videoplaylist = Videoplaylist::find($id);
+     return view ('videoplaylist.edit')->with('playlis', $videoplaylist);
    }
 
    /**
@@ -105,7 +96,34 @@ class VideosPlaylistController extends Controller
    */
    public function update(Request $request, $id)
    {
-      //
+      //datos del usuario
+      $iduser = Auth::id();
+      $results = DB::select('select * from playlis where id_user = :id', ['id' => $iduser]);
+      //dd($results);
+      $indice = $results[0]->id;
+      $videoplaylist = Videoplaylist::find($id);
+       //verifica que la url este vacia con esto damos por hecho que se carga un video de la pc
+        if ($request->url== null) {
+          //recibe el input del video que seleccinamos
+          $file = $request->file('video');
+          $path =  public_path() . '\videos\Playlist';
+          //obtenemos la extension del archhivo
+          $extension = $request->file('video')->getClientOriginalExtension();
+          //contiene el nombre que le dimos al video y la extension de la misma.
+          $name = $videoplaylist->name . '.' . $extension;
+          $url = ($path.'\\'.$name);
+          $videoplaylist->url=$url;
+          $videoplaylist->id_playlis=$indice;
+          //mueve el archivo a la carpeta que establecimos anteriormente
+          $file->move($path.'\\'.$name);
+          //enviamos los datos ya actualizados
+          $videoplaylist->save();
+        }else{
+          //de lo contrario se estaria guardando la url del video de youtube
+          $videoplaylist->url= $request->url;
+          $videoplaylist->id_playlis=$indice;
+          $videoplaylist->save();
+        }
    }
 
   /**
@@ -116,7 +134,10 @@ class VideosPlaylistController extends Controller
    */
    public function destroy($id)
    {
-
+      $videoplaylist = Videoplaylist::find($id);
+      $videoplaylist->delete();
+      flash("Se ha eliminado usuario de forma exitosa")->error();
+      return redirect()->route('user.index');
    }
 
    public function __construct()
